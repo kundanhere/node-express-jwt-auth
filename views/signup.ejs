@@ -1,0 +1,63 @@
+<!-- import header -->
+<%- include('partials/header'); -%>
+
+<form>
+    <h2>Sign up</h2>
+    <label for="email">Email</label>
+    <input type="text" name="email" required />
+    <div class="email error"></div>
+    <label for="password">Password</label>
+    <input type="password" name="password" required />
+    <div class="password error"></div>
+    <button>Sign up</button>
+</form>
+
+<script type="text/javascript">
+  // get DOM Elements
+  const form = document.querySelector('form');
+  const emailError = document.querySelector('.email.error');
+  const passwordError = document.querySelector('.password.error');
+
+  form.addEventListener('submit', async (e) => {
+    // prevent from page refresh
+    e.preventDefault();
+
+    // reset errors
+    emailError.textContent = '';
+    passwordError.textContent = '';
+
+    // get the values
+    let email = form.email.value;
+    let password = form.password.value;
+
+    try {
+      let response = await fetch('/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),        
+      });
+
+      let data = await response.json();
+      // check if user validation failed then show it to the user
+      if (data.error) {
+        emailError.textContent = data.error.email;
+        passwordError.textContent = data.error.password;
+        return;
+      }
+      // when the user successfully registered, refer it to the home page
+      if (data.user) {
+        location.assign('/');
+      }
+    } catch (error) {
+      // display other errors
+      console.log(error);
+    }
+  });
+
+</script>
+
+<!-- import footer -->
+<%- include('partials/footer'); -%>
